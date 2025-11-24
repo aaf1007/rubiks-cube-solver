@@ -1,6 +1,6 @@
 package rubikscube;
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 public class Solver {
@@ -22,5 +22,15 @@ public class Solver {
 		// solve...
 		//File output = new File(args[1]);
 
+		// Getting Cube states
+		try {
+			RubiksCube cube1 = new RubiksCube("testcases/scramble01/txt");
+			// Call solve function
+		} catch (IOException e) {
+			System.out.println("Incorrect Format");
+		} catch (IncorrectFormatException f) {
+			System.out.println("Incorrect Format");
+		}
+		
 	}
 }
