@@ -1,15 +1,15 @@
 package rubikscube;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 public class Solver {
-	public static void main(String[] args) {
-//		System.out.println("number of arguments: " + args.length);
-//		for (int i = 0; i < args.length; i++) {
-//			System.out.println(args[i]);
-//		}
 
+	public static void main(String[] args) {
+		//		System.out.println("number of arguments: " + args.length);
+		//		for (int i = 0; i < args.length; i++) {
+		//			System.out.println(args[i]);
+		//		}
+		
 		if (args.length < 2) {
 			System.out.println("File names are not specified");
 			System.out.println("usage: java " + MethodHandles.lookup().lookupClass().getName() + " input_file output_file");
@@ -22,15 +22,6 @@ public class Solver {
 		// solve...
 		//File output = new File(args[1]);
 
-		// Getting Cube states
-		try {
-			RubiksCube cube1 = new RubiksCube("testcases/scramble01/txt");
-			// Call solve function
-		} catch (IOException e) {
-			System.out.println("Incorrect Format");
-		} catch (IncorrectFormatException f) {
-			System.out.println("Incorrect Format");
-		}
-		
 	}
+
 }

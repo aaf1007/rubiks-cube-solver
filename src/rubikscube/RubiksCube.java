@@ -2,6 +2,7 @@ package rubikscube;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class RubiksCube {
@@ -64,6 +65,28 @@ public class RubiksCube {
         String content = builder.toString();
         validateFormat(content);
         initializeFromString(content);
+    }
+
+    /**
+     *  Copy Constructor
+     * @param other
+     */
+    public RubiksCube(RubiksCube other) {
+        this.cube = new char[9][12];
+        for (int i = 0; i < 9; i++) {
+            System.arraycopy(other.cube[i], 0, this.cube[i], 0, 12);
+        }
+    }
+
+    /**
+     * 
+     * @param str - RubiksCube represented as a String
+     * @return RubiksCube object
+     */
+    public RubiksCube stringToRubiksCube(String str) {
+        RubiksCube ret = new RubiksCube();
+        this.initializeFromString(str);
+        return ret;
     }
 
     /**
@@ -143,7 +166,7 @@ public class RubiksCube {
     }
 
     /**
-     * @param moves
+     * @param moves - String of moves
      * Applies the sequence of moves on the Rubik's Cube
      */
     public void applyMoves(String moves) {
@@ -151,13 +174,28 @@ public class RubiksCube {
         // For all loop to call applyMove(char)
 
         String validMoves = "FBRLUD";
-        for (char move : moves.toCharArray()) {
-            applyMove(move);
+        char[] move = moves.toCharArray();
+
+        for (int i = 0; i < move.length; i++) {
+            if (i+1 < move.length && move[i+1] == '\'') {
+                // Counter-clockwise rotation so call it 3 times
+                for (int j = 0; j < 3; j++)
+                    applyMove(move[i]);
+
+                i++; // Skip \'
+                continue;
+            }
+
+            if (move[i] == '\'')
+                continue;
+            
+            applyMove(move[i]);
         }
     }
 
     /**
-     * For applying one moveS
+     * For applying one moves
+     * @param char of single move
      */
      private void applyMove(char move) {
         switch (move) {
@@ -275,7 +313,7 @@ public class RubiksCube {
                 cube[8][3] = tempL[2];
                 break;
                 
-            case 'U': {
+            case 'U': 
                 rotateFace(0, 3); // Orange face
                 char[] tempU = new char[3];
                 // Save Front top row
@@ -299,9 +337,7 @@ public class RubiksCube {
                 cube[3][1] = tempU[1];
                 cube[3][2] = tempU[2];
                 break;
-            }
-                
-                
+                  
             case 'D':
                 rotateFace(6, 3); // Red face
                 char[] tempD = new char[3];
@@ -398,5 +434,36 @@ public class RubiksCube {
         } while (!cube.toString().equals(initialState));
         
         return count;
+    }
+
+    /**
+     * Get internal cube array (for heuristic calculations)
+     */
+    public char[][] getCube() {
+        return cube;
+    }
+
+    /**
+     * @return RubiksCube obj that is copied from param
+     */
+    public RubiksCube copy() {
+        return new RubiksCube(this);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(cube);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+
+        RubiksCube other = (RubiksCube) obj;
+
+        return Arrays.deepEquals(this.cube, other.cube);
     }
 }

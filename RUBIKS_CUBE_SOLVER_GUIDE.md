@@ -111,16 +111,18 @@ From any state, you can make:
 
 ### 3.2 The Algorithm (Detailed Pseudocode)
 
+**Note**: This version uses move pruning instead of state tracking for better performance within the 10-second time limit.
+
 ```
 function IDA_Star_Solve(initialCube):
     bound = heuristic(initialCube)  // Initial threshold
-    path = [initialCube]            // Current path being explored
+    movePath = []                   // Track moves made (for solution)
 
     loop forever:
-        result = search(path, 0, bound)
+        result = search(initialCube, movePath, 0, bound, null)
 
         if result == FOUND:
-            return path  // Solution found!
+            return movePath  // Solution found!
 
         if result == INFINITY:
             return FAILURE  // No solution exists
@@ -130,46 +132,67 @@ function IDA_Star_Solve(initialCube):
 end function
 
 
-function search(path, g, bound):
-    currentCube = last element of path
-    f = g + heuristic(currentCube)
+function search(cube, movePath, g, bound, lastMove):
+    f = g + heuristic(cube)
 
     // Prune: if f exceeds bound, don't explore further
     if f > bound:
         return f  // Return the f-value for next threshold
 
     // Goal test
-    if currentCube.isSolved():
+    if cube.isSolved():
         return FOUND
 
     min = INFINITY  // Track minimum f-value beyond bound
 
     // Try all possible moves
     for each move in [F, F', B, B', R, R', L, L', U, U', D, D']:
-        // Optimization: don't undo the previous move
-        if move is not inverse of last move in path:
+        // Smart pruning: avoid redundant move sequences
+        if NOT isRedundantMove(lastMove, move):
 
-            newCube = currentCube.copy()
+            newCube = cube.copy()
             newCube.applyMove(move)
+            movePath.add(move)
 
-            // Avoid cycles: don't revisit states in current path
-            if newCube not in path:
-                path.add(newCube)
+            result = search(newCube, movePath, g + 1, bound, move)
 
-                result = search(path, g + 1, bound)
+            if result == FOUND:
+                return FOUND
 
-                if result == FOUND:
-                    return FOUND
+            if result < min:
+                min = result  // Track best f-value found
 
-                if result < min:
-                    min = result  // Track best f-value found
-
-                path.removeLast()  // Backtrack
-            end if
+            movePath.removeLast()  // Backtrack
         end if
     end for
 
     return min
+end function
+
+
+function isRedundantMove(lastMove, currentMove):
+    if lastMove is null:
+        return false  // First move, can't be redundant
+
+    // Get face letters (without prime notation)
+    lastFace = first character of lastMove
+    currentFace = first character of currentMove
+
+    // Rule 1: Don't apply same face twice in a row (F then F)
+    // This includes F then F' (inverse moves)
+    if lastFace == currentFace:
+        return true
+
+    // Rule 2: Maintain ordering for opposite faces
+    // This prevents exploring both F,B and B,F (they commute)
+    if (lastFace == 'F' and currentFace == 'B'):
+        return true
+    if (lastFace == 'L' and currentFace == 'R'):
+        return true
+    if (lastFace == 'U' and currentFace == 'D'):
+        return true
+
+    return false
 end function
 ```
 
