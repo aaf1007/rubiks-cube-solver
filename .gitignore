@@ -1,3 +1,4 @@
+#Ignore all except README
 *.md
 !README.md
 test-implementations/
