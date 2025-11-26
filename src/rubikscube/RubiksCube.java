@@ -381,6 +381,7 @@ public class RubiksCube {
                 cube[5][2] = cube[5][11];
                 
                 // Back bottom row <- Right bottom row
+                
                 cube[5][9] = cube[5][6];
                 cube[5][10] = cube[5][7];
                 cube[5][11] = cube[5][8];
