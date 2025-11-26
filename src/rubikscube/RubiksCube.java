@@ -169,29 +169,29 @@ public class RubiksCube {
      * @param moves - String of moves
      * Applies the sequence of moves on the Rubik's Cube
      */
-    public void applyMoves(String moves) {
-        // TODO implement me
-        // For all loop to call applyMove(char)
+    // public void applyMoves(String moves) {
+    //     // TODO implement me
+    //     // For all loop to call applyMove(char)
 
-        String validMoves = "FBRLUD";
-        char[] move = moves.toCharArray();
+    //     String validMoves = "FBRLUD";
+    //     char[] move = moves.toCharArray();
 
-        for (int i = 0; i < move.length; i++) {
-            if (i+1 < move.length && move[i+1] == '\'') {
-                // Counter-clockwise rotation so call it 3 times
-                for (int j = 0; j < 3; j++)
-                    applyMove(move[i]);
+    //     for (int i = 0; i < move.length; i++) {
+    //         if (i+1 < move.length && move[i+1] == '\'') {
+    //             // Counter-clockwise rotation so call it 3 times
+    //             for (int j = 0; j < 3; j++)
+    //                 applyMove(move[i]);
 
-                i++; // Skip \'
-                continue;
-            }
+    //             i++; // Skip \'
+    //             continue;
+    //         }
 
-            if (move[i] == '\'')
-                continue;
+    //         if (move[i] == '\'')
+    //             continue;
             
-            applyMove(move[i]);
-        }
-    }
+    //         applyMove(move[i]);
+    //     }
+    // }
 
     /**
      * For applying one moves
