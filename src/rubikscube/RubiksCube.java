@@ -399,6 +399,46 @@ public class RubiksCube {
                 cube[5][8] = t3;
                 break;
             }
+
+            // Counter-clock wise rotations
+            case 'f': {
+                applyMove('F');
+                applyMove('F');
+                applyMove('F');
+                break;
+            }
+            
+            case 'b': {
+                applyMove('B');
+                applyMove('B');
+                applyMove('B');
+                break;
+            }
+            case 'r': {
+                applyMove('R');
+                applyMove('R');
+                applyMove('R');
+                break;
+            }
+            case 'l': {
+                applyMove('L');
+                applyMove('L');
+                applyMove('L');
+                break;
+            }
+            case 'u': {
+                applyMove('U');
+                applyMove('U');
+                applyMove('U');
+                break;
+            }
+            case 'd': {
+                applyMove('D');
+                applyMove('D');
+                applyMove('D');
+                break;
+            }
+
         }
     }
 
@@ -425,14 +465,40 @@ public class RubiksCube {
      *    RRR
      *    RRR
      */
+    // public boolean isSolved() {
+    //     // TODO implement me
+    //     return toString().equals(SOLVED_STATE);
+    // }
+
+
+    // Optimized version of isSolved
     public boolean isSolved() {
-        // TODO implement me
-        return toString().equals(SOLVED_STATE);
+        // Check all 6 faces. 
+        // Just check if every face has all stickers matching its center sticker.
+        
+        return isFaceUniform(0, 3) && // Up
+               isFaceUniform(3, 3) && // Front
+               isFaceUniform(3, 6) && // Right
+               isFaceUniform(3, 9) && // Back
+               isFaceUniform(3, 0) && // Left
+               isFaceUniform(6, 3);   // Down
+    }
+    
+    private boolean isFaceUniform(int startRow, int startCol) {
+        // Center sticker determines face color
+        byte centerColor = cube[startRow + 1][startCol + 1];
+
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (cube[startRow + r][startCol + c] != centerColor) 
+                    return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        // TODO implement me
         // Make 2D byte array a string
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < 9; i++) {
