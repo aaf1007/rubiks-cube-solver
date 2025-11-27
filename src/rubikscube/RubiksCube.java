@@ -19,7 +19,14 @@ public class RubiksCube {
      *    RRR
      *    RRR
      */
-
+    public static final byte ORANGE = 0;
+    public static final byte WHITE  = 1;
+    public static final byte YELLOW = 2;
+    public static final byte RED    = 3;
+    public static final byte GREEN  = 4;
+    public static final byte BLUE   = 5;
+    public static final byte SPACE  = 6;
+    
     private byte[][] cube; // 2D array of the cube
     private static final String SOLVED_STATE =
             "   OOO\n" +

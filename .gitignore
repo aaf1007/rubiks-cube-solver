@@ -1,4 +1,6 @@
-#Ignore all except README
+#Ignore all except README and IMPLEMENTATION_LOG
 *.md
 !README.md
+IMPLEMENTATION_LOG.md
 test-implementations/
+*.pdf
