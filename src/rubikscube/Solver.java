@@ -11,6 +11,9 @@ public class Solver {
 		'F', 'f', 'B', 'b', 'L', 'l', 'R', 'r', 'U', 'u', 'D', 'd'
 	};
 
+    // Precomputed inverse index: MOVES[i]'s inverse is MOVES[INVERSE_INDEX[i]]
+    private static final int[] INVERSE_INDEX = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10};
+
 	public static void main(String[] args) {
 		//		System.out.println("number of arguments: " + args.length);
 		//		for (int i = 0; i < args.length; i++) {
@@ -71,87 +74,121 @@ public class Solver {
         
         while (true) {
 			// Start Search
-            SearchResult result = search(cube, 0, threshold, heuristic, -1);
+            int result = search(cube, 0, threshold, heuristic, -1, -1, threshold);
             
-            if (result.solved) {
-                return result.path.trim();
+            if (result == -1) {
+                // Build Solution string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < solutionDepth; i++) {
+                    if (i > 0)
+                        sb.append(" ");
+                    sb.append(formatMove(solutionMoves[i]));
+                }
+                return sb.toString();
             }
             
-            if (result.nextThreshold == Integer.MAX_VALUE) {
+            if (result == Integer.MAX_VALUE) {
                 return "Unsolvable"; 
             }
             
 			// Increase Depth limit to lowest cost we saw that exceeded the current limit
-            threshold = result.nextThreshold;
+            threshold = result;
         }
     }
 
+    // Use char array instead of String concatenation
+    private static final char[] solutionMoves = new char[20];
+    private static int solutionDepth;
+
 	// Recursive IDA* Search
-    private static SearchResult search(RubiksCube cube, int g, int bound, 
-                                     ManhattanDistance h, int prevMoveIndex) {
+    // Returns: -1 = solved, Integer.MAX_VALUE = no solution, else = nextThreshold
+    private static int search(RubiksCube cube, int g, int bound, 
+                                     ManhattanDistance h, int prevMoveIndex, int prevPrevMoveIndex, int hValue) {
         
 		// F = G + H
-        int f = g + h.calculate(cube);
+        int f = g + hValue;
 		
 		// Prune if cost exceeds limit
         if (f > bound) 
-			return new SearchResult(false, null, f);
+			return f;
 
 		// Solved
-        if (cube.isSolved()) 
-			return new SearchResult(true, "", 0);
+        if (cube.isSolved()) {
+            solutionDepth = g;
+            return -1;
+        }
 
         int min = Integer.MAX_VALUE;
 
 		// Try all 12 Moves
         for (int i = 0; i < 12; i++) {
             // Optimization: Don't undo the move we just made (e.g. F then f)
-            if (prevMoveIndex != -1 && isInverse(i, prevMoveIndex)) continue; 
+            if (isRedundant(i, prevMoveIndex, prevPrevMoveIndex)) 
+                continue; 
             
             char moveChar = MOVES[i];
 
+            // Apply move
             cube.applyMove(moveChar);
 
-            SearchResult res = search(cube, g + 1, bound, h, i);
+            // Calculate new H value for recursion
+            int newHValue = h.calculate(cube);
+            
+            // Recursive call
+            int res = search(cube, g + 1, bound, h, i, prevMoveIndex, newHValue);
 
-            if (res.solved) {
-                return new SearchResult(true, formatMove(moveChar) + " " + res.path, 0);
+            if (res == -1) {
+                solutionMoves[g] = moveChar;
+                cube.applyMove(MOVES[INVERSE_INDEX[i]]);
+                return -1;
             }
 
-            if (res.nextThreshold < min) min = res.nextThreshold;
+            if (res < min) 
+                min = res;
 
             // Backtrack
-            cube.applyMove(getInverseChar(moveChar)); 
+            cube.applyMove(MOVES[INVERSE_INDEX[i]]); 
         }
 
-        return new SearchResult(false, null, min);
+        return min;
     }
 
-    private static boolean isInverse(int i1, int i2) {
-        return (i1 / 2 == i2 / 2) && (i1 != i2);
-    }
-    
-    private static char getInverseChar(char c) {
-        if (Character.isLowerCase(c)) return Character.toUpperCase(c);
-        return Character.toLowerCase(c);
+    /**
+     * Checks if the current move is redundant given the previous move.
+     * Prunes:
+     * 1. Immediate Inverse: F followed by f
+     * 2. Commutative Duplicates: B followed by F (Enforces F before B)
+     */
+    private static boolean isRedundant(int curr, int prev, int prevPrev) {
+        if (prev == -1) return false;
+
+        int currFace = curr / 2;
+        int prevFace = prev / 2;
+
+        // 1. Immediate Inverse (F then f)
+        if (currFace == prevFace && curr != prev) 
+            return true;
+
+        // 2. Commutative: opposite faces (0,1), (2,3), (4,5) -> enforce lower first
+        // Pairs: F/B (0,1), L/R (2,3), U/D (4,5)
+        int currPair = currFace / 2;
+        int prevPair = prevFace / 2;
+        if (currPair == prevPair && currFace < prevFace)
+            return true;
+
+        // 3. Three consecutive same-face moves
+        if (prevPrev != -1) {
+            int prevPrevFace = prevPrev / 2;
+            if (currFace == prevFace && prevFace == prevPrevFace)
+                return true;
+        }
+
+        return false;
     }
     
     private static String formatMove(char c) {
         if (Character.isLowerCase(c)) return Character.toUpperCase(c) + "'";
         return String.valueOf(c);
-    }
-
-	// Data Holder
-    static class SearchResult {
-        boolean solved;
-        String path;
-        int nextThreshold;
-
-        public SearchResult(boolean s, String p, int n) {
-            this.solved = s; 
-            this.path = p; 
-            this.nextThreshold = n;
-        }
     }
 
 }
