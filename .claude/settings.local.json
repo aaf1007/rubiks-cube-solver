@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(javac:*)",
+      "Bash(cd /Users/antonflorendo7/Desktop/CMPT\\ 225/final-proj-v1/src && java rubikscube.Solver ../testcases/scramble01.txt /tmp/sol01.txt:*)",
+      "Bash(cd /Users/antonflorendo7/Desktop/CMPT\\ 225/final-proj-v1/src:*)",
+      "Bash(java TestSolver:*)",
+      "Bash(for i in 01 02 03 04 05 06 07 08 09 10)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(timeout 12 java rubikscube.Solver:*)",
+      "Bash(done)",
+      "Bash(timeout 15 java:*)",
+      "Bash(timeout 5 java:*)",
+      "Bash(java:*)",
+      "Bash(timeout 25 java:*)",
+      "Bash(cd /Users/antonflorendo7/Desktop/CMPT\\ 225/final-proj-v1/src && timeout 10 java rubikscube.Solver ../testcases/scramble01.txt /tmp/sol01.txt:*)",
+      "Bash(timeout 10 java:*)",
+      "Bash(timeout 30 java:*)",
+      "Bash(timeout 60 java:*)",
+      "mcp__ide__getDiagnostics"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
